@@ -2,115 +2,83 @@
 <html lang="vi">
 <head>
     <meta charset="UTF-8">
-    <title>Đặt Vé & Gửi Hàng - Nhà Xe Trần Quý</title>
+    <title>Nhà Xe Trần Quý</title>
     <style>
-        :root { --main: #1a2a6c; --sub: #f8f9fa; --booked: #d1d8e0; --selected: #27ae60; }
-        body { font-family: 'Arial', sans-serif; background: #f0f2f5; margin: 0; padding: 20px; }
-        .wrapper { max-width: 1000px; margin: auto; display: flex; gap: 30px; }
-        .bus-card { background: white; padding: 25px; border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.1); flex: 1; }
-        .grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin-top: 20px; }
-        .seat { height: 50px; background: var(--sub); border: 1px solid #ddd; border-radius: 6px; display: flex; align-items: center; justify-content: center; cursor: pointer; font-weight: bold; font-size: 14px; }
-        .seat.booked { background: var(--booked); cursor: not-allowed; color: #999; }
-        .seat.selected { background: var(--selected); color: white; }
-        .form-card { background: white; padding: 25px; border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.1); flex: 1.2; }
-        .input-group { margin-bottom: 15px; }
-        label { display: block; margin-bottom: 8px; font-weight: bold; color: #333; }
-        input, select, textarea { width: 100%; padding: 12px; border: 1px solid #ccc; border-radius: 6px; box-sizing: border-box; }
-        .btn-confirm { background: var(--main); color: white; width: 100%; padding: 15px; border: none; border-radius: 6px; font-size: 16px; font-weight: bold; cursor: pointer; margin-top: 10px; }
-        .hidden { display: none; }
+        body { font-family: sans-serif; margin: 0; background: #f0f2f5; }
+        .nav { background: #2c3e50; padding: 15px; color: white; display: flex; justify-content: space-between; }
+        .nav a { color: white; margin-left: 15px; text-decoration: none; font-weight: bold; }
+        .container { display: flex; max-width: 1000px; margin: 20px auto; gap: 20px; }
+        .box { background: white; padding: 20px; border-radius: 8px; flex: 1; }
+        .grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-top: 15px; }
+        .seat { height: 50px; background: #ddd; display: flex; align-items: center; justify-content: center; cursor: pointer; border-radius: 4px; }
+        .seat.booked { background: #e74c3c; color: white; cursor: not-allowed; }
+        .seat.selected { background: #27ae60; color: white; }
+        input { width: 100%; padding: 8px; margin: 5px 0 10px; box-sizing: border-box; }
+        button { width: 100%; padding: 10px; background: #2980b9; color: white; border: none; cursor: pointer; }
     </style>
 </head>
 <body>
-    <div class="wrapper">
-        <div class="bus-card" id="seat-section">
-            <h3 style="text-align: center; margin-top:0;">Sơ Đồ Ghế Xe</h3>
-            <div class="grid" id="bus-grid"></div>
+    <div class="nav">
+        <div>NHÀ XE TRẦN QUÝ</div>
+        <div>
+            {% if current_user.is_authenticated %}
+                <span>Xin chào, {{ current_user.username }}</span>
+                <a href="/my-tickets">VÉ CỦA TÔI</a>
+                <a href="/logout">Đăng xuất</a>
+            {% else %}
+                <a href="/login">Đăng Nhập</a>
+                <a href="/register">Đăng Ký</a>
+            {% endif %}
         </div>
+    </div>
 
-        <div class="form-card">
-            <h3 style="margin-top:0;">Thông Tin Đăng Ký</h3>
-            <form action="/book" method="POST">
-                <div class="input-group">
-                    <label>Loại dịch vụ</label>
-                    <select name="type" id="service_type" onchange="handleTypeChange()">
-                        <option value="ticket">Đặt vé hành khách</option>
-                        <option value="cargo">Gửi hàng hóa</option>
-                    </select>
-                </div>
-
-                <div id="seat-display" class="input-group">
-                    <label>Ghế đã chọn: <span id="current-seat" style="color: var(--selected)">Chưa chọn</span></label>
-                    <input type="hidden" name="seat_id" id="seat_id_input">
-                </div>
-
-                <div class="input-group">
-                    <label>Họ và tên</label>
-                    <input type="text" name="customer_name" required placeholder="Nhập tên người gửi/đi">
-                </div>
-
-                <div class="input-group">
-                    <label>Số điện thoại</label>
-                    <input type="tel" name="customer_phone" required placeholder="090xxxxxxx">
-                </div>
-
-                <div class="input-group">
-                    <label>Ngày đi/gửi</label>
-                    <input type="date" name="travel_date" required>
-                </div>
-
-                <div class="input-group">
-                    <label>Điểm đón / Nơi gửi</label>
-                    <input type="text" name="pickup_point" required placeholder="Địa chỉ chi tiết">
-                </div>
-
-                <div class="input-group">
-                    <label>Điểm trả / Nơi nhận</label>
-                    <input type="text" name="dropoff_point" required placeholder="Địa chỉ chi tiết">
-                </div>
-
-                <div class="input-group">
-                    <label id="note-label">Ghi chú</label>
-                    <textarea name="note" rows="3" placeholder="Thông tin thêm (VD: Hàng dễ vỡ, đón tại bưu điện...)"></textarea>
-                </div>
-
-                <button type="submit" class="btn-confirm">TIẾP TỤC THANH TOÁN</button>
+    <div class="container">
+        <div class="box">
+            <h3>Sơ Đồ Ghế</h3>
+            <div class="grid" id="grid"></div>
+        </div>
+        <div class="box">
+            <h3>Đặt Vé</h3>
+            <form action="/book" method="POST" id="form">
+                <input type="text" id="seat_show" readonly placeholder="Chọn ghế bên trái...">
+                <input type="hidden" name="seat_id" id="seat_id">
+                <input type="text" name="customer_name" placeholder="Họ tên" required>
+                <input type="text" name="customer_phone" placeholder="Số điện thoại" required>
+                <input type="date" name="travel_date" required>
+                <input type="text" name="pickup_point" placeholder="Điểm đón" required>
+                <input type="text" name="dropoff_point" placeholder="Điểm trả" required>
+                <button type="submit">XÁC NHẬN ĐẶT</button>
             </form>
         </div>
     </div>
 
     <script>
-        const booked = JSON.parse('{{ booked_seats|tojson | safe }}');
-        const grid = document.getElementById('bus-grid');
-        const labels = ['A', 'B']; // Tầng A và Tầng B
+        // Tao thêm dấu nháy ' ' để đánh lừa VS Code cho nó đỡ báo lỗi đỏ
+        var bookedData = '{{ booked_seats|tojson|safe }}';
+        var isLoggedData = '{{ "true" if current_user.is_authenticated else "false" }}';
 
-        labels.forEach(l => {
-            for(let i=1; i<=12; i++) {
-                const id = l + i;
-                const div = document.createElement('div');
-                div.className = 'seat' + (booked.includes(id) ? ' booked' : '');
-                div.innerText = id;
-                if(!booked.includes(id)) {
-                    div.onclick = () => {
-                        if(document.getElementById('service_type').value !== 'ticket') return;
-                        document.querySelectorAll('.seat').forEach(s => s.classList.remove('selected'));
-                        div.classList.add('selected');
-                        document.getElementById('seat_id_input').value = id;
-                        document.getElementById('current-seat').innerText = id;
+        var booked = JSON.parse(bookedData);
+        var isLoggedIn = (isLoggedData === 'true');
+        
+        for(let i=1; i<=24; i++) {
+            let id = 'A' + i;
+            let div = document.createElement('div');
+            div.className = 'seat' + (booked.includes(id) ? ' booked' : '');
+            div.innerText = id;
+            if(!booked.includes(id)) {
+                div.onclick = function() {
+                    if(!isLoggedIn) {
+                        alert("Vui lòng đăng nhập trước!");
+                        window.location.href = '/login';
+                        return;
                     }
+                    document.querySelectorAll('.seat').forEach(s => s.classList.remove('selected'));
+                    this.classList.add('selected');
+                    document.getElementById('seat_id').value = id;
+                    document.getElementById('seat_show').value = "Ghế " + id;
                 }
-                grid.appendChild(div);
             }
-        });
-
-        function handleTypeChange() {
-            const isCargo = document.getElementById('service_type').value === 'cargo';
-            document.getElementById('seat-section').style.opacity = isCargo ? '0.3' : '1';
-            document.getElementById('seat-display').classList.toggle('hidden', isCargo);
-            document.getElementById('note-label').innerText = isCargo ? "Mô tả hàng hóa" : "Ghi chú";
-            if(isCargo) {
-                document.getElementById('seat_id_input').value = '';
-                document.querySelectorAll('.seat').forEach(s => s.classList.remove('selected'));
-            }
+            document.getElementById('grid').appendChild(div);
         }
     </script>
 </body>

@@ -1,44 +1,31 @@
-{% extends "base.html" %}
-
-{% block content %}
-<div class="bg-white rounded-lg shadow p-6">
-    <div class="flex justify-between items-center mb-6">
-        <h2 class="text-2xl font-bold text-slate-800 uppercase">Danh Sách Đặt Vé</h2>
-        <span class="bg-slate-200 text-slate-800 px-3 py-1 rounded-full text-sm font-bold">Tổng: {{ ve_xe|length }} vé</span>
-    </div>
-
-    <div class="overflow-x-auto">
-        <table class="min-w-full text-left text-sm">
-            <thead class="bg-slate-100 text-slate-600 uppercase font-bold">
-                <tr>
-                    <th class="px-6 py-3">Mã Vé</th>
-                    <th class="px-6 py-3">Khách Hàng</th>
-                    <th class="px-6 py-3">Lộ Trình</th>
-                    <th class="px-6 py-3">Ngày Đi</th>
-                    <th class="px-6 py-3">Giường</th>
-                    <th class="px-6 py-3">Thao Tác</th>
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <title>Quản lý nhà xe</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-100 p-8">
+    <div class="max-w-4xl mx-auto bg-white rounded-lg shadow p-6">
+        <h1 class="text-2xl font-bold mb-6">Danh sách đặt vé</h1>
+        <table class="w-full border-collapse">
+            <thead>
+                <tr class="bg-gray-200">
+                    <th class="border p-2">Số ghế</th>
+                    <th class="border p-2">Khách hàng</th>
+                    <th class="border p-2">Số điện thoại</th>
                 </tr>
             </thead>
-            <tbody class="divide-y divide-gray-200">
-                {% for ve in ve_xe %}
-                <tr class="hover:bg-gray-50">
-                    <td class="px-6 py-4 font-mono font-bold text-yellow-700">{{ ve.ma_ve }}</td>
-                    <td class="px-6 py-4">
-                        <div class="font-bold text-gray-900">{{ ve.ten }}</div>
-                        <div class="text-gray-500">{{ ve.sdt }}</div>
-                    </td>
-                    <td class="px-6 py-4 text-blue-900 font-semibold">{{ ve.tuyen }}</td>
-                    <td class="px-6 py-4">{{ ve.ngay_di }}</td>
-                    <td class="px-6 py-4">{{ ve.loai_giuong }}</td>
-                    <td class="px-6 py-4">
-                        <a href="/admin/xoa/{{ ve.ma_ve }}" class="text-red-600 hover:text-red-900 font-bold" onclick="return confirm('Mày chắc chắn muốn xóa vé này không?')">
-                            Hủy vé
-                        </a>
-                    </td>
+            <tbody>
+                {% for id, info in seats.items() %}
+                <tr>
+                    <td class="border p-2 text-center">{{ id }}</td>
+                    <td class="border p-2 text-center">{{ info.name if info else 'Trống' }}</td>
+                    <td class="border p-2 text-center">{{ info.phone if info else '-' }}</td>
                 </tr>
                 {% endfor %}
             </tbody>
         </table>
     </div>
-</div>
-{% endblock %}
+</body>
+</html>

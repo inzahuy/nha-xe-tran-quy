@@ -72,4 +72,8 @@ def xoa_ve(ma_ve):
     return redirect(url_for('admin'))
 
 if __name__ == '__main__':
-    app.run(debug=True)
+    import os
+    # Đây là chỗ lấy cổng từ server Render
+    port = int(os.environ.get('PORT', 5000))
+    # Chạy trên mọi địa chỉ IP với cổng vừa lấy được
+    app.run(host='0.0.0.0', port=port)

@@ -1,79 +1,56 @@
-from flask import Flask, render_template, request, redirect, url_for
-from datetime import datetime
+from flask import Flask, render_template, request, jsonify
+from flask_sqlalchemy import SQLAlchemy
+import os
 
 app = Flask(__name__)
 
-# Cấu hình cơ bản
-app.secret_key = 'tranquy_bus_secret' 
+# Dán cái Internal Database URL của mày vào đây hoặc cấu hình trong Environment Variables trên Render
+app.config['SQLALCHEMY_DATABASE_URL'] = os.environ.get('DATABASE_URL')
+app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
-# Dữ liệu giả lập (Lưu tạm trong RAM)
-# Mày có thể đổi list này theo đúng lộ trình nhà mày
-LO_TRINH = [
-    "Hà Nội", "Ninh Bình", "Thanh Hóa", "Vinh (Nghệ An)", 
-    "Hà Tĩnh", "Đồng Hới (Quảng Bình)", "Huế", "Đà Nẵng", 
-    "Quy Nhơn", "Nha Trang", "Phan Thiết", "Sài Gòn"
-]
+db = SQLAlchemy(app)
 
-danh_sach_ve = []
+# Định nghĩa bảng dữ liệu ghế
+class Seat(db.Model):
+    id = db.Column(db.String(10), primary_key=True)
+    customer_name = db.Column(db.String(100), nullable=True)
+    customer_phone = db.Column(db.String(20), nullable=True)
 
 @app.route('/')
 def index():
-    return render_template('index.html', lo_trinh=LO_TRINH)
+    all_seats = Seat.query.all()
+    # Chuyển dữ liệu từ database sang dạng dictionary để frontend dễ đọc
+    seats_dict = {s.id: {'name': s.customer_name, 'phone': s.customer_phone} if s.customer_name else None for s in all_seats}
+    return render_template('index.html', seats=seats_dict)
 
-@app.route('/dat-ve', methods=['POST'])
-def dat_ve():
-    # Lấy dữ liệu từ form
-    ten = request.form.get('ten')
-    sdt = request.form.get('sdt')
-    diem_di = request.form.get('diem_di')
-    diem_den = request.form.get('diem_den')
-    ngay_di = request.form.get('ngay_di')
-    loai_giuong = request.form.get('loai_giuong')
-    ghi_chu = request.form.get('ghi_chu')
-
-    # Tạo mã vé
-    ma_ve = f"TQ{len(danh_sach_ve) + 1000}"
-    thoi_gian_dat = datetime.now().strftime("%H:%M %d/%m/%Y")
-
-    ve_moi = {
-        'ma_ve': ma_ve,
-        'ten': ten,
-        'sdt': sdt,
-        'tuyen': f"{diem_di} đi {diem_den}",
-        'ngay_di': ngay_di,
-        'loai_giuong': loai_giuong,
-        'ghi_chu': ghi_chu,
-        'thoi_gian_dat': thoi_gian_dat,
-        'trang_thai': 'Chờ thanh toán'
-    }
-
-    danh_sach_ve.append(ve_moi)
+@app.route('/book', methods=['POST'])
+def book():
+    data = request.json
+    seat_id = data.get('seat_id')
+    name = data.get('name')
+    phone = data.get('phone')
     
-    # Điều hướng sang trang xem lại vé (Giải quyết vấn đề của mày)
-    return redirect(url_for('xem_ve', ma_ve=ma_ve))
+    seat = Seat.query.get(seat_id)
+    if seat.customer_name is not None:
+        return jsonify({'status': 'error', 'message': 'Ghế này đã có người hốt'}), 400
+        
+    seat.customer_name = name
+    seat.customer_phone = phone
+    db.session.commit()
+    
+    return jsonify({'status': 'success', 'message': f'Đã chốt ghế {seat_id}'})
 
-@app.route('/ve/<ma_ve>')
-def xem_ve(ma_ve):
-    # Tìm vé vừa đặt để hiển thị
-    ve_tim_thay = next((ve for ve in danh_sach_ve if ve['ma_ve'] == ma_ve), None)
-    if ve_tim_thay:
-        return render_template('success.html', ve=ve_tim_thay)
-    return "Không tìm thấy vé", 404
-
-@app.route('/admin')
-def admin():
-    # Trang quản trị cho Đích tôn
-    return render_template('admin.html', ve_xe=danh_sach_ve)
-
-@app.route('/admin/xoa/<ma_ve>')
-def xoa_ve(ma_ve):
-    global danh_sach_ve
-    danh_sach_ve = [ve for ve in danh_sach_ve if ve['ma_ve'] != ma_ve]
-    return redirect(url_for('admin'))
+# Lệnh khởi tạo database (chỉ chạy một lần hoặc dùng khi cần reset)
+@app.cli.command("init-db")
+def init_db():
+    db.create_all()
+    # Tạo sẵn 24 ghế trống nếu chưa có
+    if not Seat.query.first():
+        for i in range(1, 25):
+            db.session.add(Seat(id=str(i)))
+        db.session.commit()
+    print("Đã khởi tạo database xong!")
 
 if __name__ == '__main__':
-    import os
-    # Đây là chỗ lấy cổng từ server Render
     port = int(os.environ.get('PORT', 5000))
-    # Chạy trên mọi địa chỉ IP với cổng vừa lấy được
     app.run(host='0.0.0.0', port=port)

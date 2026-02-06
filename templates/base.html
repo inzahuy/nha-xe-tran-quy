@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Nhà Xe Trần Quý - Uy Tín Tuyến Bắc Nam</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #f3f4f6; }
+        .brand-color { color: #b45309; } /* Màu vàng đồng sang trọng */
+        .bg-brand { background-color: #1e293b; } /* Màu nền tối nghiêm túc */
+    </style>
+</head>
+<body class="flex flex-col min-h-screen">
+    <header class="bg-brand text-white shadow-lg">
+        <div class="container mx-auto px-6 py-4 flex justify-between items-center">
+            <div class="flex items-center space-x-3">
+                <i class="fas fa-bus text-3xl text-yellow-500"></i>
+                <div>
+                    <h1 class="text-2xl font-bold uppercase tracking-wide">Trần Quý Trans</h1>
+                    <p class="text-xs text-gray-400">Chuyên tuyến Bắc - Nam</p>
+                </div>
+            </div>
+            <nav>
+                <a href="/" class="px-4 py-2 hover:text-yellow-500 transition font-semibold">Đặt Vé</a>
+                <a href="/admin" class="px-4 py-2 hover:text-yellow-500 transition font-semibold">Quản Trị</a>
+            </nav>
+        </div>
+    </header>
+
+    <main class="flex-grow container mx-auto px-4 py-8">
+        {% block content %}{% endblock %}
+    </main>
+
+    <footer class="bg-gray-800 text-gray-400 py-6 text-center text-sm border-t-4 border-yellow-600">
+        <p>© 2026 Nhà Xe Trần Quý. Hotline: 09xx.xxx.xxx</p>
+        <p>Hệ thống quản lý vận tải độc quyền.</p>
+    </footer>
+</body>
+</html>

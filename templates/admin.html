@@ -1,0 +1,44 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="bg-white rounded-lg shadow p-6">
+    <div class="flex justify-between items-center mb-6">
+        <h2 class="text-2xl font-bold text-slate-800 uppercase">Danh Sách Đặt Vé</h2>
+        <span class="bg-slate-200 text-slate-800 px-3 py-1 rounded-full text-sm font-bold">Tổng: {{ ve_xe|length }} vé</span>
+    </div>
+
+    <div class="overflow-x-auto">
+        <table class="min-w-full text-left text-sm">
+            <thead class="bg-slate-100 text-slate-600 uppercase font-bold">
+                <tr>
+                    <th class="px-6 py-3">Mã Vé</th>
+                    <th class="px-6 py-3">Khách Hàng</th>
+                    <th class="px-6 py-3">Lộ Trình</th>
+                    <th class="px-6 py-3">Ngày Đi</th>
+                    <th class="px-6 py-3">Giường</th>
+                    <th class="px-6 py-3">Thao Tác</th>
+                </tr>
+            </thead>
+            <tbody class="divide-y divide-gray-200">
+                {% for ve in ve_xe %}
+                <tr class="hover:bg-gray-50">
+                    <td class="px-6 py-4 font-mono font-bold text-yellow-700">{{ ve.ma_ve }}</td>
+                    <td class="px-6 py-4">
+                        <div class="font-bold text-gray-900">{{ ve.ten }}</div>
+                        <div class="text-gray-500">{{ ve.sdt }}</div>
+                    </td>
+                    <td class="px-6 py-4 text-blue-900 font-semibold">{{ ve.tuyen }}</td>
+                    <td class="px-6 py-4">{{ ve.ngay_di }}</td>
+                    <td class="px-6 py-4">{{ ve.loai_giuong }}</td>
+                    <td class="px-6 py-4">
+                        <a href="/admin/xoa/{{ ve.ma_ve }}" class="text-red-600 hover:text-red-900 font-bold" onclick="return confirm('Mày chắc chắn muốn xóa vé này không?')">
+                            Hủy vé
+                        </a>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

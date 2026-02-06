@@ -5,7 +5,11 @@ import os
 app = Flask(__name__)
 
 # Dán cái Internal Database URL của mày vào đây hoặc cấu hình trong Environment Variables trên Render
-app.config['SQLALCHEMY_DATABASE_URL'] = os.environ.get('DATABASE_URL')
+db_url = os.environ.get('DATABASE_URL')
+if db_url and db_url.startswith("postgres://"):
+    db_url = db_url.replace("postgres://", "postgresql://", 1)
+
+app.config['SQLALCHEMY_DATABASE_URI'] = db_url
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
 db = SQLAlchemy(app)
@@ -18,8 +22,14 @@ class Seat(db.Model):
 
 @app.route('/')
 def index():
+    # Dòng này cực kỳ quan trọng: Nó tự tạo bảng và ghế nếu chưa có
+    db.create_all() 
+    if not Seat.query.first():
+        for i in range(1, 25):
+            db.session.add(Seat(id=str(i)))
+        db.session.commit()
+        
     all_seats = Seat.query.all()
-    # Chuyển dữ liệu từ database sang dạng dictionary để frontend dễ đọc
     seats_dict = {s.id: {'name': s.customer_name, 'phone': s.customer_phone} if s.customer_name else None for s in all_seats}
     return render_template('index.html', seats=seats_dict)
 

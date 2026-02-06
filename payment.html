@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <title>Thanh Toán Đơn Hàng - Nhà Xe Trần Quý</title>
+    <style>
+        body { font-family: sans-serif; background: #f4f7f6; display: flex; justify-content: center; padding: 40px; }
+        .payment-card { background: white; padding: 40px; border-radius: 15px; box-shadow: 0 10px 30px rgba(0,0,0,0.1); max-width: 500px; width: 100%; text-align: center; }
+        .status-badge { background: #fff3cd; color: #856404; padding: 5px 15px; border-radius: 20px; font-size: 14px; }
+        .details { text-align: left; background: #f9f9f9; padding: 20px; border-radius: 10px; margin: 20px 0; }
+        .qr-code { width: 250px; height: 250px; margin: 20px auto; border: 1px solid #eee; display: flex; align-items: center; justify-content: center; background: #fafafa; }
+        .bank-info { font-size: 18px; font-weight: bold; color: #2c3e50; margin-bottom: 5px; }
+    </style>
+</head>
+<body>
+    <div class="payment-card">
+        <h2>Xác nhận đặt chỗ</h2>
+        <span class="status-badge">{{ booking.status }}</span>
+        
+        <div class="details">
+            <p><strong>Khách hàng:</strong> {{ booking.customer_name }}</p>
+            <p><strong>Dịch vụ:</strong> {{ 'Đặt vé (Ghế ' + booking.seat_id + ')' if booking.booking_type == 'ticket' else 'Gửi hàng hóa' }}</p>
+            <p><strong>Lộ trình:</strong> {{ booking.pickup_point }} ➜ {{ booking.dropoff_point }}</p>
+            <p><strong>Ngày:</strong> {{ booking.travel_date }}</p>
+        </div>
+
+        <div class="bank-info">Ngân hàng MB Bank</div>
+        <div>Số tài khoản: <strong>03110699999999</strong></div>
+        <div>Chủ TK: <strong>TRẦN PHẠM GIA HUY</strong></div>
+        <div style="margin-top: 10px; color: #e74c3c;">Nội dung CK: <strong>{{ booking.customer_phone }}</strong></div>
+
+        <div style="margin: 20px auto; text-align: center;">
+            <p style="font-weight: bold; color: #2c3e50;">Quét mã để thanh toán nhanh</p>
+    
+            <img src="https://img.vietqr.io/image/mbbank-03110699999999-compact2.jpg?amount=0&addInfo={{ booking.customer_phone }}%20thanh%20toan&accountName=TRAN%20QUY" 
+            alt="Mã QR Thanh Toán" 
+            style="width: 100%; max-width: 250px; border: 5px solid #fff; box-shadow: 0 4px 10px rgba(0,0,0,0.1); border-radius: 10px;">
+    
+            <p style="font-size: 12px; color: #e74c3c; margin-top: 10px;">
+            * Vui lòng giữ nguyên nội dung chuyển khoản để hệ thống xác nhận tự động.
+            </p>
+        </div>
+
+        <p><small>Vui lòng chuyển khoản đúng nội dung là Số Điện Thoại. Hệ thống sẽ xác nhận ngay khi nhận được tiền.</small></p>
+        <hr>
+        <a href="/" style="color: #3498db; text-decoration: none;">Quay lại Trang chủ</a>
+    </div>
+</body>
+</html>
